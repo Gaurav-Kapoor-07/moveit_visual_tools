@@ -1373,6 +1373,121 @@ bool MoveItVisualTools::publishTrajectoryLine(const robot_trajectory::RobotTraje
     publishSphere(tip_pose, color, rviz_visual_tools::MEDIUM);
   }
 
+  const std::string& ee_parent_link_name = ee_parent_link->getName();
+
+  std::string trajectory_topic_name = "/summit/trajectory/" + ee_parent_link_name;
+  // RCLCPP_INFO_STREAM(LOGGER, "ee_parent_link_name: " << ee_parent_link_name);
+ 
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_publisher_ = node_->create_publisher<visualization_msgs::msg::MarkerArray>(trajectory_topic_name, 10);
+
+  visualization_msgs::msg::MarkerArray markerarray;
+
+  for (std::size_t i = 0; i < path.size(); ++i)
+  {
+    const Eigen::Vector3d& points = path[i]; 
+    
+    // RCLCPP_INFO_STREAM(LOGGER, "ee_parent_link_name: " << ee_parent_link_name << " trajectory: points: x: "<< points.x() << " y: " << points.y() << " z: " << points.z());
+    
+    visualization_msgs::msg::Marker marker;
+    
+    marker.header.frame_id = "base_footprint";
+    marker.header.stamp = node_->now();
+    // marker.header.stamp = rclcpp::Time(0);
+    // marker.header.stamp.sec = 0;
+    // marker.header.stamp.nanosec = 0;
+    marker.ns = "trajectory";
+    marker.type = visualization_msgs::msg::Marker::SPHERE;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    marker.scale.x = 0.05;
+    marker.scale.y = 0.05;
+    marker.scale.z = 0.05;
+    marker.color.r = 0.0;  
+    marker.color.g = 1.0;
+    marker.color.b = 0.0;
+    marker.color.a = 1.0;
+    // marker.id = i;
+    
+    marker.id = marker_count_;
+    marker_count_++;
+     
+    marker.pose.position.x = points.x();  
+    marker.pose.position.y = points.y();
+    marker.pose.position.z = points.z();
+
+    RCLCPP_INFO_STREAM(LOGGER, "ee_parent_link_name: " << ee_parent_link_name << " trajectory: points: x: "<< marker.pose.position.x << " y: " << marker.pose.position.y << " z: " << marker.pose.position.z);
+
+    markerarray.markers.push_back(marker);
+
+    // RCLCPP_INFO_STREAM(LOGGER, "ee_parent_link_name: " << ee_parent_link_name << " trajectory: points: x: "<< points.x() << " y: " << points.y() << " z: " << points.z());
+  }
+
+  // for (std::size_t j = 0; j < markerarray.markers.size(); ++j)
+  // {
+  //   visualization_msgs::msg::Marker marker_check = markerarray.markers[j];
+
+  //   RCLCPP_INFO_STREAM(LOGGER, "Frame ID: " << marker_check.header.frame_id << ", stamp.sec: " << marker_check.header.stamp.sec << ", stamp.nanosec: " << marker_check.header.stamp.nanosec << ", Marker ID: " << marker_check.id << ", Position - x: " << marker_check.pose.position.x << ", y: " << marker_check.pose.position.y << ", z: " << marker_check.pose.position.z);
+  // }
+
+  marker_array_publisher_->publish(markerarray);
+
+  // const moveit::core::LinkModel* parent_link_model = ee_parent_link->getParentLinkModel();
+
+  // const std::string& parent_link_name = parent_link_model->getName();
+
+  // RCLCPP_INFO_STREAM(LOGGER, "parent_link_name " << parent_link_name);
+
+  // rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr point_cloud_publisher_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>("/summit/eef_trajectory_point_cloud", 10);
+
+  // sensor_msgs::msg::PointCloud2 msg;
+
+  // msg.header.stamp = node_->now();
+  // msg.header.frame_id = "base_footprint";
+
+  // // Fill in the size of the cloud
+  // msg.height = 1;
+  // msg.width = path.size();
+
+  // RCLCPP_INFO_STREAM(LOGGER, "msg.width " << msg.width);  
+
+  // // Create the modifier to setup the fields and memory
+  // sensor_msgs::PointCloud2Modifier mod(msg);
+
+  // // Set the fields that our cloud will have
+  // mod.setPointCloud2FieldsByString(2, "xyz", "rgb");
+
+  // // Set up memory for our points
+  // mod.resize(msg.height * msg.width);
+
+  // // Now create iterators for fields
+  // sensor_msgs::PointCloud2Iterator<float> iter_x(msg, "x");
+  // sensor_msgs::PointCloud2Iterator<float> iter_y(msg, "y");
+  // sensor_msgs::PointCloud2Iterator<float> iter_z(msg, "z");
+  // sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(msg, "r");
+  // sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(msg, "g");
+  // sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(msg, "b");
+
+  // // double iterx = 0.0;
+
+  // for (std::size_t i = 0; i < path.size() && iter_x != iter_x.end(); ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_r, ++iter_g, ++iter_b)
+  // {
+  //   const Eigen::Vector3d& points = path[i];
+
+  //   *iter_x = points.x();
+  //   *iter_y = points.y();
+  //   *iter_z = points.z();
+  //   *iter_r = 0;
+  //   *iter_g = 255;
+  //   *iter_b = 0;
+
+  //   // iterx = *iter_x;
+
+  //   // point_cloud_publisher_->publish(msg);
+  // }
+
+  // // std::cout << "lastvalue of iter_x: " << iterx << std::endl;
+
+  // // point_cloud_publisher_->publish(msg);
+
   const double radius = 0.005;
   publishPath(path, color, radius);
 
@@ -1389,20 +1504,54 @@ bool MoveItVisualTools::publishTrajectoryLine(const moveit_msgs::msg::RobotTraje
     return false;
   }
 
-  std::vector<const moveit::core::LinkModel*> tips;
-  if (!arm_jmg->getEndEffectorTips(tips) || tips.empty())
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to get end effector tips from jmg");
-    return false;
-  }
+  std::vector<const moveit::core::LinkModel*> links = arm_jmg->getLinkModels();
 
-  // For each end effector
-  for (const moveit::core::LinkModel* ee_parent_link : tips)
+  // const moveit::core::LinkModel* ee_parent_link = links[8];
+  // const std::string& link_name = ee_parent_link->getName();
+
+  // RCLCPP_INFO_STREAM(LOGGER, "end effector name: " << link_name);
+
+  // std::vector<const moveit::core::LinkModel*> tips;
+  // if (!arm_jmg->getEndEffectorTips(tips) || tips.empty())
+  // {
+  //   RCLCPP_ERROR_STREAM(LOGGER, "Unable to get end effector tips from jmg");
+  //   return false;
+  // }
+
+  // const std::vector<std::string>& link_names = arm_jmg->getLinkModelNames();
+  
+  // for (const auto& name : link_names) {
+  //   std::cerr << "Link Name: " << name << std::endl; // Print each link name
+  // }
+  
+  // // For each end effector
+  // for (const moveit::core::LinkModel* ee_parent_link : tips)
+  // {
+  //   if (!publishTrajectoryLine(trajectory_msg, ee_parent_link, arm_jmg, color))
+  //     return false;
+  // }
+
+  // return true;
+
+  // // For end effector
+  // if (!publishTrajectoryLine(trajectory_msg, ee_parent_link, arm_jmg, color))
+  // {
+  //   return false;
+  // }
+
+  for (size_t k = 0; k < 9; k++)
   {
+    const moveit::core::LinkModel* ee_parent_link = links[k];
+    const std::string& link_name = ee_parent_link->getName();
+
+    RCLCPP_INFO_STREAM(LOGGER, "end effector name: " << link_name);
+
     if (!publishTrajectoryLine(trajectory_msg, ee_parent_link, arm_jmg, color))
+    {
       return false;
+    }
   }
-
+  
   return true;
 }
 

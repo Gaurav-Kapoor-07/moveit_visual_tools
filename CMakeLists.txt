@@ -19,6 +19,7 @@ find_package(tf2_eigen REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   Boost
@@ -33,6 +34,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   tf2_ros
   trajectory_msgs
   visualization_msgs
+  sensor_msgs
 )
 
 # Visualization Tools Library

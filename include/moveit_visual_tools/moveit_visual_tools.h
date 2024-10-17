@@ -50,6 +50,10 @@
 // ROS Messages
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <graph_msgs/msg/geometry_graph.hpp>
+#include "sensor_msgs/msg/point_cloud2.hpp"
+#include "sensor_msgs/point_cloud2_iterator.hpp"
+#include "visualization_msgs/msg/marker.hpp"
+#include "visualization_msgs/msg/marker_array.hpp"
 
 // C++
 #include <map>
@@ -740,6 +744,8 @@ protected:
   // Optional offset that can be applied to all outgoing/published robot states
   bool robot_state_root_offset_enabled_ = false;
   Eigen::Isometry3d robot_state_root_offset_;
+
+  int marker_count_{0};
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW  // http://eigen.tuxfamily.org/dox/group__TopicStructHavingEigenMembers.html
