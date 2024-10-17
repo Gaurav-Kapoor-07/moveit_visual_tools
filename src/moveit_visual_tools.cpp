@@ -1506,6 +1506,9 @@ bool MoveItVisualTools::publishTrajectoryLine(const moveit_msgs::msg::RobotTraje
 
   std::vector<const moveit::core::LinkModel*> links = arm_jmg->getLinkModels();
 
+  // int links_size = links.size();
+
+  // RCLCPP_INFO_STREAM(LOGGER, "links_size: " << links_size);
   // const moveit::core::LinkModel* ee_parent_link = links[8];
   // const std::string& link_name = ee_parent_link->getName();
 
@@ -1539,7 +1542,7 @@ bool MoveItVisualTools::publishTrajectoryLine(const moveit_msgs::msg::RobotTraje
   //   return false;
   // }
 
-  for (size_t k = 0; k < 9; k++)
+  for (size_t k = 0; k < links.size(); k++)
   {
     const moveit::core::LinkModel* ee_parent_link = links[k];
     const std::string& link_name = ee_parent_link->getName();
