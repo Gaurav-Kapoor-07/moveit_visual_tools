@@ -1542,7 +1542,7 @@ bool MoveItVisualTools::publishTrajectoryLine(const moveit_msgs::msg::RobotTraje
   //   return false;
   // }
 
-  for (size_t k = 0; k < links.size(); k++)
+  for (std::size_t k = 0; k < links.size(); ++k)
   {
     const moveit::core::LinkModel* ee_parent_link = links[k];
     const std::string& link_name = ee_parent_link->getName();
