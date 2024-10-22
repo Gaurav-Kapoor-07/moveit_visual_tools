@@ -1405,6 +1405,7 @@ bool MoveItVisualTools::publishTrajectoryLine(const robot_trajectory::RobotTraje
     marker.color.g = 1.0;
     marker.color.b = 0.0;
     marker.color.a = 1.0;
+    marker.lifetime.sec = 2 * 60;
     // marker.id = i;
     
     marker.id = marker_count_;
