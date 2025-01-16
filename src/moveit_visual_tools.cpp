@@ -1415,7 +1415,7 @@ bool MoveItVisualTools::publishTrajectoryLine(const robot_trajectory::RobotTraje
     marker.pose.position.y = points.y();
     marker.pose.position.z = points.z();
 
-    RCLCPP_INFO_STREAM(LOGGER, "ee_parent_link_name: " << ee_parent_link_name << " trajectory: points: x: "<< marker.pose.position.x << " y: " << marker.pose.position.y << " z: " << marker.pose.position.z);
+    // RCLCPP_INFO_STREAM(LOGGER, "ee_parent_link_name: " << ee_parent_link_name << " trajectory: points: x: "<< marker.pose.position.x << " y: " << marker.pose.position.y << " z: " << marker.pose.position.z);
 
     markerarray.markers.push_back(marker);
 
@@ -1548,7 +1548,7 @@ bool MoveItVisualTools::publishTrajectoryLine(const moveit_msgs::msg::RobotTraje
     const moveit::core::LinkModel* ee_parent_link = links[k];
     const std::string& link_name = ee_parent_link->getName();
 
-    RCLCPP_INFO_STREAM(LOGGER, "end effector name: " << link_name);
+    // RCLCPP_INFO_STREAM(LOGGER, "end effector name: " << link_name);
 
     if (!publishTrajectoryLine(trajectory_msg, ee_parent_link, arm_jmg, color))
     {
